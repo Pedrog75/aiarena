@@ -5,5 +5,14 @@ libs = ["lib"]
 solc_version = "0.8.13"
 optimizer = true
 
+[invariant]
+runs = 256
+depth = 500
+fail_on_revert = false
 
-# See more config options https://github.com/foundry-rs/foundry/tree/master/config
+[fuzz]
+run = 1000
+seed = "0x2"
+
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

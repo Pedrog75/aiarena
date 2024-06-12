@@ -36,7 +36,7 @@ contract FighterFarm is ERC721, ERC721Enumerable {
     uint8[2] public maxRerollsAllowed = [3, 3];
 
     /// @notice The cost ($NRN) to reroll a fighter.
-    uint256 public rerollCost = 1000 * 10**18;    
+    uint256 public rerollCost = 1000 * 10**18;
 
     /// @notice Stores the current generation for each fighter type.
     uint8[2] public generation = [0, 0];
@@ -108,7 +108,7 @@ contract FighterFarm is ERC721, ERC721Enumerable {
         _delegatedAddress = delegatedAddress;
         treasuryAddress = treasuryAddress_;
         numElements[0] = 3;
-    } 
+    }
 
     /*//////////////////////////////////////////////////////////////
                             EXTERNAL FUNCTIONS
@@ -182,7 +182,7 @@ contract FighterFarm is ERC721, ERC721Enumerable {
         _tokenURIs[tokenId] = newTokenURI;
     }
 
-    /// @notice Enables users to claim a pre-determined number of fighters. 
+    /// @notice Enables users to claim a pre-determined number of fighters.
     /// @dev The function verifies the message signature is from the delegated address.
     /// @param numToMint Array specifying the number of fighters to be claimed for each fighter type.
     /// @param signature Signature of the claim message.
@@ -193,12 +193,12 @@ contract FighterFarm is ERC721, ERC721Enumerable {
         bytes calldata signature,
         string[] calldata modelHashes,
         string[] calldata modelTypes
-    ) 
-        external 
+    )
+        external
     {
         bytes32 msgHash = bytes32(keccak256(abi.encode(
-            msg.sender, 
-            numToMint[0], 
+            msg.sender,
+            numToMint[0],
             numToMint[1],
             nftsClaimed[msg.sender][0],
             nftsClaimed[msg.sender][1]
@@ -210,9 +210,9 @@ contract FighterFarm is ERC721, ERC721Enumerable {
         nftsClaimed[msg.sender][1] += numToMint[1];
         for (uint16 i = 0; i < totalToMint; i++) {
             _createNewFighter(
-                msg.sender, 
+                msg.sender,
                 uint256(keccak256(abi.encode(msg.sender, fighters.length))),
-                modelHashes[i], 
+                modelHashes[i],
                 modelTypes[i],
                 i < numToMint[0] ? 0 : 1,
                 0,
@@ -223,12 +223,12 @@ contract FighterFarm is ERC721, ERC721Enumerable {
 
     /// @notice Burns multiple mint passes in exchange for fighter NFTs.
     /// @dev This function requires the length of all input arrays to be equal.
-    /// @dev Each input array must correspond to the same index, i.e., the first element in each 
+    /// @dev Each input array must correspond to the same index, i.e., the first element in each
     /// array belongs to the same mint pass, and so on.
     /// @param mintpassIdsToBurn Array of mint pass IDs to be burned for each fighter to be minted.
     /// @param mintPassDnas Array of DNA strings of the mint passes to be minted as fighters.
     /// @param fighterTypes Array of fighter types corresponding to the fighters being minted.
-    /// @param modelHashes Array of ML model hashes corresponding to the fighters being minted. 
+    /// @param modelHashes Array of ML model hashes corresponding to the fighters being minted.
     /// @param modelTypes Array of ML model types corresponding to the fighters being minted.
     function redeemMintPass(
         uint256[] calldata mintpassIdsToBurn,
@@ -237,12 +237,12 @@ contract FighterFarm is ERC721, ERC721Enumerable {
         string[] calldata mintPassDnas,
         string[] calldata modelHashes,
         string[] calldata modelTypes
-    ) 
-        external 
+    )
+        external
     {
         require(
-            mintpassIdsToBurn.length == mintPassDnas.length && 
-            mintPassDnas.length == fighterTypes.length && 
+            mintpassIdsToBurn.length == mintPassDnas.length &&
+            mintPassDnas.length == fighterTypes.length &&
             fighterTypes.length == modelHashes.length &&
             modelHashes.length == modelTypes.length
         );
@@ -250,9 +250,9 @@ contract FighterFarm is ERC721, ERC721Enumerable {
             require(msg.sender == _mintpassInstance.ownerOf(mintpassIdsToBurn[i]));
             _mintpassInstance.burn(mintpassIdsToBurn[i]);
             _createNewFighter(
-                msg.sender, 
-                uint256(keccak256(abi.encode(mintPassDnas[i]))), 
-                modelHashes[i], 
+                msg.sender,
+                uint256(keccak256(abi.encode(mintPassDnas[i]))),
+                modelHashes[i],
                 modelTypes[i],
                 fighterTypes[i],
                 iconsTypes[i],
@@ -281,10 +281,10 @@ contract FighterFarm is ERC721, ERC721Enumerable {
     /// @param modelHash The hash of the machine learning model.
     /// @param modelType The type of machine learning model.
     function updateModel(
-        uint256 tokenId, 
+        uint256 tokenId,
         string calldata modelHash,
         string calldata modelType
-    ) 
+    )
         external
     {
         require(msg.sender == ownerOf(tokenId));
@@ -311,18 +311,18 @@ contract FighterFarm is ERC721, ERC721Enumerable {
     /// @param modelType The type of the ML model associated with the fighter.
     /// @param customAttributes Array with [element, weight] of the newly created fighter.
     function mintFromMergingPool(
-        address to, 
-        string calldata modelHash, 
-        string calldata modelType, 
+        address to,
+        string calldata modelHash,
+        string calldata modelType,
         uint256[2] calldata customAttributes
-    ) 
-        public 
+    )
+        public
     {
         require(msg.sender == _mergingPoolAddress);
         _createNewFighter(
-            to, 
-            uint256(keccak256(abi.encode(msg.sender, fighters.length))), 
-            modelHash, 
+            to,
+            uint256(keccak256(abi.encode(msg.sender, fighters.length))),
+            modelHash,
             modelType,
             0,
             0,
@@ -336,11 +336,11 @@ contract FighterFarm is ERC721, ERC721Enumerable {
     /// @param to Address of the new owner.
     /// @param tokenId ID of the fighter being transferred.
     function transferFrom(
-        address from, 
-        address to, 
+        address from,
+        address to,
         uint256 tokenId
-    ) 
-        public 
+    )
+        public
         override(ERC721, IERC721)
     {
         require(_ableToTransfer(tokenId, to));
@@ -353,11 +353,11 @@ contract FighterFarm is ERC721, ERC721Enumerable {
     /// @param to Address of the new owner.
     /// @param tokenId ID of the fighter being transferred.
     function safeTransferFrom(
-        address from, 
-        address to, 
+        address from,
+        address to,
         uint256 tokenId
-    ) 
-        public 
+    )
+        public
         override(ERC721, IERC721)
     {
         require(_ableToTransfer(tokenId, to));
@@ -388,7 +388,7 @@ contract FighterFarm is ERC721, ERC721Enumerable {
             );
             _tokenURIs[tokenId] = "";
         }
-    }    
+    }
 
     /// @notice Returns the URI where the contract metadata is stored.
     /// @return URI where the contract metadata is stored.
@@ -460,12 +460,12 @@ contract FighterFarm is ERC721, ERC721Enumerable {
     /// @param fighterType The type of the fighter.
     /// @return Attributes of the new fighter: element, weight, and dna.
     function _createFighterBase(
-        uint256 dna, 
+        uint256 dna,
         uint8 fighterType
-    ) 
-        private 
-        view 
-        returns (uint256, uint256, uint256) 
+    )
+        private
+        view
+        returns (uint256, uint256, uint256)
     {
         uint256 element = dna % numElements[generation[fighterType]];
         uint256 weight = dna % 31 + 65;
@@ -482,18 +482,18 @@ contract FighterFarm is ERC721, ERC721Enumerable {
     /// @param iconsType Type of icons fighter (0 means it's not an icon).
     /// @param customAttributes Array with [element, weight] of the newly created fighter.
     function _createNewFighter(
-        address to, 
-        uint256 dna, 
+        address to,
+        uint256 dna,
         string memory modelHash,
-        string memory modelType, 
+        string memory modelType,
         uint8 fighterType,
         uint8 iconsType,
         uint256[2] memory customAttributes
-    ) 
-        private 
-    {  
+    )
+        private
+    {
         require(balanceOf(to) < MAX_FIGHTERS_ALLOWED);
-        uint256 element; 
+        uint256 element;
         uint256 weight;
         uint256 newDna;
         if (customAttributes[0] == 100) {
