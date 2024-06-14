@@ -17,16 +17,21 @@ contract BreakInvariant is StdInvariant, Test {
     VoltageManager _voltageManagerContract;
     GameItems _gameItemsContract;
     MergingPool _mergingPoolContract;
+
     address internal constant _DELEGATED_ADDRESS = 0x22F4441ad6DbD602dFdE5Cd8A38F6CAdE68860b0;
     address internal constant _GAME_SERVER_ADDRESS = 0x7C0a2BAd62C664076eFE14b7f2d90BF6Fd3a6F6C;
     address internal _ownerAddress = address(1);
     address internal _treasuryAddress = address(2);
     address internal _neuronContributorAddress = address(3);
+    address internal admin = address(5);
 
-
-    function setUp() public{
+    function setUp() public {
+    vm.prank(admin);
     _fighterFarmContract = new FighterFarm(_ownerAddress, _DELEGATED_ADDRESS, _treasuryAddress);
+
+    vm.prank(admin);
     _neuronContract = new Neuron(_ownerAddress, _treasuryAddress, _neuronContributorAddress);
+
     _gameItemsContract = new GameItems(_ownerAddress, _treasuryAddress);
     _voltageManagerContract = new VoltageManager(_ownerAddress, address(_gameItemsContract));
     _rankedBattleContract = new RankedBattle(

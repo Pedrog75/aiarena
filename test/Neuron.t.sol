@@ -234,6 +234,12 @@ contract NeuronTest is Test {
         assertEq(_neuronContract.allowance(_ownerAddress, spender), 0);
     }
 
+    function testNeverCanBeRevoked() public {
+      _neuronContract.addMinter(_ownerAddress);
+      vm.expectRevert();
+      _neuronContract.revokeRole(keccak256("MINTER_ROLE"), _ownerAddress);
+    }
+
     /// @notice Test owner approving a staker over an amount.
     function testApproveStakeWithStakerRole() public {
         address staker = vm.addr(3);

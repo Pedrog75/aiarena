@@ -8,7 +8,7 @@ optimizer = true
 [invariant]
 runs = 256
 depth = 500
-fail_on_revert = false
+fail_on_revert = true
 
 [fuzz]
 run = 1000

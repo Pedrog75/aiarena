@@ -361,6 +361,38 @@ contract FighterFarmTest is Test {
             }
         }
     }
+    function testRerollBypassMaxRerollsAllowed() public {
+      _mintFromMergingPool(_ownerAddress);
+      // get 4k neuron from treasury
+      _fundUserWith4kNeuronByTreasury(_ownerAddress);
+      // after successfully minting a fighter, update the model
+      if (_fighterFarmContract.ownerOf(0) == _ownerAddress) {
+        uint8 maxRerolls = _fighterFarmContract.maxRerollsAllowed(0);
+        uint8 exceededLimit = maxRerolls + 1;
+        uint8 tokenId = 0;
+        uint8 fighterType = 0;
+        // The Dendroid's generation changed, anx maxReroolsAllowed for Dendroid is increased
+        uint8 fighterType_Dendroid = 1;
+        _fighterFarmContract.incrementGeneration(fighterType_Dendroid);
+        assertEq(_fighterFarmContract.maxRerollsAllowed(fighterType_Dendroid), maxRerolls + 1);
+        assertEq(_fighterFarmContract.maxRerollsAllowed(fighterType), maxRerolls);
+
+        _neuronContract.addSpender(address(_fighterFarmContract));
+        for(uint8 i = 0; i < exceededLimit; i++) {
+          if(i == (maxRerolls)){
+            //reRoll withh different fighterType
+            assertEq(_fighterFarmContract.numRerolls(tokenId), maxRerolls);
+            _fighterFarmContract.reRoll(tokenId, fighterType_Dendroid);
+            assertEq(_fighterFarmContract.numRerolls(tokenId), exceededLimit);
+          }
+          else {
+            _fighterFarmContract.reRoll(tokenId, fighterType);
+          }
+        }
+
+      }
+    }
+
 
     /// @notice Test that tokenId exists after minting a fighter.
     function testDoesTokenExists() public {

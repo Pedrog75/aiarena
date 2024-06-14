@@ -238,6 +238,30 @@ contract GameItemsTest is Test {
         assertEq(_gameItemsContract.balanceOf(_ownerAddress, 0), 0);
     }
 
+    function testBatchTransferFunction() public {
+        _fundUserWith4kNeuronByTreasury(_ownerAddress);
+        _gameItemsContract.mint(0, 1);
+        // Verify that the owner has 1 battery
+        assertEq(_gameItemsContract.balanceOf(_ownerAddress, 0), 1);
+        // lock game item
+        _gameItemsContract.adjustTransferability(0, false);
+        // try to transfer the locked game item
+        vm.expectRevert();
+        _gameItemsContract.safeTransferFrom(_ownerAddress, _DELEGATED_ADDRESS, 0, 1, "");
+        // Verify that the owner still has 1 battery
+        assertEq(_gameItemsContract.balanceOf(_ownerAddress, 0), 1);
+        assertEq(_gameItemsContract.balanceOf(_DELEGATED_ADDRESS, 0), 0);
+        // transfer 1 battery to the delegated address via safeBatchTransferFrom
+        uint256[] memory id = new uint256[](1);
+        id[0] = 0;
+        uint256[] memory amount = new uint256[](1);
+        amount[0] = 1;
+        _gameItemsContract.safeBatchTransferFrom(_ownerAddress, _DELEGATED_ADDRESS, id, amount, "");
+        // Verify that the owner has 0 battery
+        assertEq(_gameItemsContract.balanceOf(_ownerAddress, 0), 0);
+        assertEq(_gameItemsContract.balanceOf(_DELEGATED_ADDRESS, 0), 1);
+    }
+
     /*//////////////////////////////////////////////////////////////
                                HELPERS
     //////////////////////////////////////////////////////////////*/
