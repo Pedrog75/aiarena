@@ -94,6 +94,7 @@ contract BreakInvariantV2 is StdInvariant, Test {
     _mergingPoolContract =
         new MergingPool(_ownerAddress, address(_rankedBattleContract),
         address(_fighterFarmContract));
+
     _stakeAtRiskContract =new StakeAtRisk(
       _treasuryAddress, address(_neuronContract), address(_rankedBattleContract));
     _voltageManagerContract.adjustAllowedVoltageSpenders(
@@ -124,26 +125,28 @@ contract BreakInvariantV2 is StdInvariant, Test {
   }
 
   /// @notice Test transferring ownership from an none owner account.
-    function testTransferOwnershipFromNonOwnerV2() public {
+  function testTransferOwnershipFromNonOwnerV2() public {
         vm.startPrank(msg.sender);
         vm.expectRevert();
         _fighterFarmContract.transferOwnership(msg.sender);
         vm.expectRevert();
         _fighterFarmContract.incrementGeneration(1);
         assertEq(_fighterFarmContract.generation(1), 0);
-    }
+  }
 
   function statefulFuzz_testInvariantBreakV2() public {
         // Check the invariant
         assertEq(_fighterFarmContract.ownerOf(tokenId), player);
   }
+
   function _mintFromMergingPool(address to) internal {
       vm.prank(address(_mergingPoolContract));
       _fighterFarmContract.mintFromMergingPool(to, "_neuralNetHash", "original", [uint256(1), uint256(80)]);
   }
+
   function _fundUserWith4kNeuronByTreasury(address user) internal {
         vm.prank(_treasuryAddress);
         _neuronContract.transfer(user, 4_000 * 10 ** 18);
         assertEq(4_000 * 10 ** 18 == _neuronContract.balanceOf(user), true);
-    }
+  }
 }
