@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract Invariant is StdInvariant, Test {
 
-    FighterFarm  fighterFarm;
+    FighterFarm fighterFarm;
     Handler handler;
     MergingPool mergingPoolContract;
     Neuron neuronContract;
@@ -24,18 +24,27 @@ contract Invariant is StdInvariant, Test {
     address internal _ownerAddress;
     address internal _treasuryAddress;
     uint256 tokenId = 1;
+    uint256 amount;
 
     function setUp() public {
-    // vm.startPrank(player);
-    // tokenId = 0;
-    // _mintFromMergingPool(player);
-    // _fundUserWith4kNeuronByTreasury(player);
-    // _rankedBattleContract.stakeNRN(1 * 10 ** 18, tokenId);
-    // vm.stopPrank();
+
     _ownerAddress = address(this);
-    _treasuryAddress = vm.addr(1);
+    _treasuryAddress = vm.addr(5);
+    // on mint un fighter NFT
+    vm.prank(address(mergingPoolContract));
+    fighterFarm.mintFromMergingPool(player, "_neuralNetHash", "original", [uint256(1), uint256(80)]);
+    // on fund le joueur avec des tokens neuron
+    vm.prank(_treasuryAddress);
+    neuronContract.transfer(player, 4_000 * 10 ** 18);
+    assertEq(4_000 * 10 ** 18 == neuronContract.balanceOf(player), true);
+    // on stake un fighter NFT
+    amount = bound(amount, 0, 1*10**18);
+    vm.prank(address(rankedBattleContract));
+    rankedBattleContract.stakeNRN(amount, tokenId);
+
+
     fighterFarm = new FighterFarm(_ownerAddress, _DELEGATED_ADDRESS, _treasuryAddress);
-    handler = new Handler(fighterFarm, mergingPoolContract, neuronContract, rankedBattleContract, player, otherplayer, _treasuryAddress);
+    handler = new Handler(fighterFarm, mergingPoolContract, neuronContract, rankedBattleContract, player, _treasuryAddress);
 
     bytes4[] memory selectors = new bytes4[](4);
     selectors[0] = handler.mintFromMergingPool.selector;
@@ -48,6 +57,6 @@ contract Invariant is StdInvariant, Test {
     }
 
     function statefulFuzz_NFTLockedCanBeTransferred() public {
-      assertEq(fighterFarm.ownerOf(tokenId), otherplayer);
+      assertEq(fighterFarm.ownerOf(tokenId), player);
     }
 }

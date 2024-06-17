@@ -8,12 +8,14 @@ import { AiArenaHelper } from "./AiArenaHelper.sol";
 import { Neuron } from "./Neuron.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import {Test, console} from "forge-std/Test.sol";
+
 
 /// @title AI Arena Fighter NFT
 /// @author ArenaX Labs Inc.
 /// @notice This contract manages the creation, ownership, and redemption of AI Arena Fighter NFTs,
 /// including the ability to mint new NFTs from a merging pool or through the redemption of mint passes.
-contract FighterFarm is ERC721, ERC721Enumerable {
+contract FighterFarm is ERC721, ERC721Enumerable, Test {
 
     /*//////////////////////////////////////////////////////////////
                                 EVENTS
@@ -318,7 +320,9 @@ contract FighterFarm is ERC721, ERC721Enumerable {
     )
         public
     {
+      console.log("dans la fonction");
         require(msg.sender == _mergingPoolAddress);
+        console.log("mintFromMergingPool");
         _createNewFighter(
             to,
             uint256(keccak256(abi.encode(msg.sender, fighters.length))),

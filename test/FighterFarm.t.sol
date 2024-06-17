@@ -223,8 +223,8 @@ contract FighterFarmTest is Test {
         _fighterFarmContract.updateFighterStaking(0, true);
         assertEq(_fighterFarmContract.fighterStaked(0), true);
     }
-
-    /// @notice Test transferring a fighter while staked.
+    /////////////////////////////////////////////////////////
+    /// @notice Test transferring a fighter while staked. ///
     function testTransferringFighterWhileStakedFails() public {
         _mintFromMergingPool(_ownerAddress);
         _fighterFarmContract.addStaker(_ownerAddress);

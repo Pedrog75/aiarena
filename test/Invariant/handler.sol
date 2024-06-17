@@ -29,7 +29,6 @@ contract Handler is Test {
       Neuron _neuronContract,
       RankedBattle _rankedBattleContract,
       address _player,
-      address _otherplayer,
       address _treasuryAddress
       ) {
         fighterFarm = _fighterFarm;
@@ -37,7 +36,6 @@ contract Handler is Test {
         neuronContract = _neuronContract;
         rankedBattleContract = _rankedBattleContract;
         player = _player;
-        otherplayer = _otherplayer;
         treasuryAddress = _treasuryAddress;
       }
 
